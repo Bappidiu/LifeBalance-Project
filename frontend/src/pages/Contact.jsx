@@ -10,55 +10,47 @@ const Contact = () => {
   const messagesEndRef = useRef(null);
 
   const apiKey = import.meta.env.VITE_API_KEY;
-  if (!apiKey) {
-    console.error('API Key is missing!');
-    setMessages((prev) => [
-      ...prev,
-      { text: 'Error: API key is missing. Please contact the administrator.', sender: 'bot' },
-    ]);
-  }
 
+  // --- FIX IS HERE ---
+  // We use 'gemini-pro' because it is the most stable model on the free tier.
+  // If you really want flash, try 'gemini-1.5-flash-latest' (but gemini-pro is safer).
   const genAI = new GoogleGenerativeAI(apiKey);
-  const model = genAI.getGenerativeModel({ model: 'gemini-1.5-flash' });
+  // Using the model available in your list
+const model = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  const sendMessage = async (retries = 3, delay = 2000) => {
+  const sendMessage = async () => {
     if (!userInput.trim()) return;
 
-    setMessages((prev) => [...prev, { text: userInput, sender: 'user' }]);
+    // Add user message to UI immediately
+    const newMessages = [...messages, { text: userInput, sender: 'user' }];
+    setMessages(newMessages);
     setLoading(true);
+    setUserInput(''); // Clear input early
 
-    for (let attempt = 1; attempt <= retries; attempt++) {
-      try {
-        const result = await model.generateContent(userInput);
-        const response = await result.response;
-        const text = response.text();
-        setMessages((prev) => [...prev, { text, sender: 'bot' }]);
-        setUserInput('');
-        setLoading(false);
-        return;
-      } catch (error) {
-        console.error(`API Error (Attempt ${attempt}/${retries}):`, error.message);
+    try {
+      // Send the message to Gemini
+      const result = await model.generateContent(userInput);
+      const response = await result.response;
+      const text = response.text();
 
-        if (error.message.includes('503') && attempt < retries) {
-          await new Promise((resolve) => setTimeout(resolve, delay));
-          continue;
-        }
-
-        let errorMessage = 'Could not get response. Please try again.';
-        if (error.message.includes('API key')) {
-          errorMessage = 'Invalid API key. Please contact the administrator.';
-        } else if (error.message.includes('503')) {
-          errorMessage = 'The AI server is overloaded. Try again later.';
-        }
-
-        setMessages((prev) => [...prev, { text: `Error: ${errorMessage}`, sender: 'bot' }]);
-        setLoading(false);
-        return;
+      setMessages([...newMessages, { text, sender: 'bot' }]);
+    } catch (error) {
+      console.error("AI Error:", error);
+      let errorMessage = "Sorry, I encountered an error. Please try again.";
+      
+      if (error.message.includes('404')) {
+        errorMessage = "Error: Model not found. Please check Contact.jsx and ensure model is set to 'gemini-pro'.";
+      } else if (error.message.includes('API key')) {
+        errorMessage = "Error: Invalid API Key. Please check your .env file.";
       }
+
+      setMessages([...newMessages, { text: errorMessage, sender: 'bot' }]);
+    } finally {
+      setLoading(false);
     }
   };
 

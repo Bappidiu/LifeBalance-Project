@@ -1,5 +1,5 @@
 import validator from "validator";
-import bycrypt from "bcrypt";
+import bcrypt from "bcrypt"; // Fixed variable name to match usage below
 import userModel from "../models/userModel.js";
 import jwt from "jsonwebtoken";
 import { v2 as cloudinary } from "cloudinary";
@@ -15,19 +15,17 @@ const registerUser = async (req, res) => {
       return res.json({ success: false, message: "Missing Details" });
     }
 
-    // validating email format
     if (!validator.isEmail(email)) {
-      return res.json({ success: false, message: "enter a valid email" });
+      return res.json({ success: false, message: "Enter a valid email" });
     }
 
-    // validating strong password
     if (password.length < 8) {
-      return res.json({ success: false, message: "enter a strong password" });
+      return res.json({ success: false, message: "Enter a strong password" });
     }
 
-    // hashing user password
-    const salt = await bycrypt.genSalt(10);
-    const hashedPassword = await bycrypt.hash(password, salt);
+    // Hashing user password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     const userData = {
       name,
@@ -38,7 +36,8 @@ const registerUser = async (req, res) => {
     const newUser = new userModel(userData);
     const user = await newUser.save();
 
-    const token = jwt.sign({ _id: user._id }, process.env.JWT_SECRET);
+    // --- FIX: Using 'id' instead of '_id' to match middleware ---
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
 
     res.json({ success: true, token });
   } catch (error) {
@@ -57,7 +56,7 @@ const loginUser = async (req, res) => {
       return res.json({ success: false, message: "User does not exist" });
     }
 
-    const isMatch = await bycrypt.compare(password, user.password);
+    const isMatch = await bcrypt.compare(password, user.password);
 
     if (isMatch) {
       const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET);
@@ -75,9 +74,9 @@ const loginUser = async (req, res) => {
 const getProfile = async (req, res) => {
   try {
     const { userId } = req.body;
-    const useData = await userModel.findById(userId).select("-password");
+    const userData = await userModel.findById(userId).select("-password");
 
-    res.json({ success: true, user: useData });
+    res.json({ success: true, user: userData });
   } catch (error) {
     console.log(error);
     res.json({ success: false, message: error.message });
@@ -103,7 +102,6 @@ const updateProfile = async (req, res) => {
     });
 
     if (imageFile) {
-      // upload image to cloudinary
       const imageUpload = await cloudinary.uploader.upload(imageFile.path, {
         resource_type: "image",
       });
@@ -132,7 +130,7 @@ const bookAppointment = async (req, res) => {
 
     let slots_booked = docData.slots_booked;
 
-    // checking for slot availability
+    // Checking for slot availability
     if (slots_booked[slotDate]) {
       if (slots_booked[slotDate].includes(slotTime)) {
         return res.json({ success: false, message: "Slot not available" });
@@ -162,7 +160,7 @@ const bookAppointment = async (req, res) => {
     const newAppointment = new appointmentModel(appointmentData);
     await newAppointment.save();
 
-    // save new slots data in docData
+    // Save new slots data in docData
     await doctorModel.findByIdAndUpdate(docId, { slots_booked });
 
     res.json({ success: true, message: "Appointment Booked" });
@@ -172,7 +170,7 @@ const bookAppointment = async (req, res) => {
   }
 };
 
-// API to get user appointments for frontend my-appointments page
+// API to get user appointments
 const listAppointment = async (req, res) => {
   try {
     const { userId } = req.body;
@@ -192,7 +190,6 @@ const cancelAppointment = async (req, res) => {
 
     const appointmentData = await appointmentModel.findById(appointmentId);
 
-    // verify appointment user
     if (appointmentData.userId !== userId) {
       return res.json({ success: false, message: "Unauthorized action" });
     }
@@ -200,8 +197,6 @@ const cancelAppointment = async (req, res) => {
     await appointmentModel.findByIdAndUpdate(appointmentId, {
       cancelled: true,
     });
-
-    // releasing doctor slot
 
     const { docId, slotDate, slotTime } = appointmentData;
 

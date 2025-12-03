@@ -6,18 +6,17 @@ export const AppContext = createContext();
 
 const AppContextProvider = (props) => {
   const currencySymbol = "$";
-  // Get the backend URL from the environment variable
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
-
-  // Create a state to store the doctors fetched from the database
   const [doctors, setDoctors] = useState([]);
+  
+  // User Authentication State
+  const [token, setToken] = useState(localStorage.getItem('token') ? localStorage.getItem('token') : false);
+  const [userData, setUserData] = useState(false);
 
-  // Function to fetch doctors data from the API
+  // 1. Fetch Doctors List
   const getDoctorsData = async () => {
     try {
-      // Calling the API endpoint (Ensure this route exists in your backend)
       const { data } = await axios.get(backendUrl + "/api/doctor/list");
-
       if (data.success) {
         setDoctors(data.doctors);
       } else {
@@ -29,16 +28,65 @@ const AppContextProvider = (props) => {
     }
   };
 
-  // Run this function once when the app loads
+  // 2. Load User Profile Data
+  const loadUserProfileData = async () => {
+    try {
+      const { data } = await axios.get(backendUrl + '/api/user/get-profile', { headers: { token } });
+      if (data.success) {
+        setUserData(data.user);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
+  }
+
+  // 3. Book Appointment Function
+  const bookAppointment = async (docId, slotDate, slotTime) => {
+      try {
+          const {data} = await axios.post(backendUrl + '/api/user/book-appointment', {docId, slotDate, slotTime}, {headers:{token}})
+          if(data.success){
+              toast.success(data.message)
+              getDoctorsData() // Refresh slots
+              loadUserProfileData() // Refresh user history
+              return true; // Return true to indicate success
+          } else {
+              toast.error(data.message)
+              return false;
+          }
+      } catch (error) {
+          console.log(error)
+          toast.error(error.message)
+          return false;
+      }
+  }
+
   useEffect(() => {
     getDoctorsData();
   }, []);
 
+  // Load user data if token exists
+  useEffect(() => {
+    if (token) {
+      loadUserProfileData();
+    } else {
+      setUserData(false);
+    }
+  }, [token]);
+
   const value = {
     doctors,
-    currencySymbol,
     getDoctorsData,
+    currencySymbol,
+    token,
+    setToken,
     backendUrl,
+    userData,
+    setUserData,
+    loadUserProfileData,
+    bookAppointment
   };
 
   return (
