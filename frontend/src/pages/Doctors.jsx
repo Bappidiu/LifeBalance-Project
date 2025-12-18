@@ -72,15 +72,15 @@ useEffect(() => {
             <p onClick={()=> speciality === 'Gastroenterologist' ? navigate(Location ? `/doctors/${Location}` : '/doctors') : navigate(Location ? `/doctors/Gastroenterologist/${Location}` : '/doctors/Gastroenterologist')} className={`w-[94vm] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${speciality === "Gastroenterologist" ? "bg-indigo-100 text-black" : ""}`}>Gastroenterologist</p>
           </div>
           
-          <div className={` flex-col gap-4 text-sm text-gray-600 ${showFilter? 'flex': 'hidden sm:flex'}`}>
-            <p className='text-gray-600 font-bold mt-8'>Find by location</p>
+          {/* <div className={` flex-col gap-4 text-sm text-gray-600 ${showFilter? 'flex': 'hidden sm:flex'}`}> */}
+            {/* <p className='text-gray-600 font-bold mt-8'>Find by location</p>
             <p onClick={()=> Location === 'Dhaka' ? navigate(speciality ? `/doctors/${speciality}` : '/doctors') : navigate(speciality ? `/doctors/${speciality}/Dhaka` : '/doctors/Location/Dhaka')} className={`w-[94vm] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${Location === "Dhaka" ? "bg-indigo-100 text-black" : ""}`}>Dhaka</p>
             <p onClick={()=> Location === 'Chittagonj' ? navigate(speciality ? `/doctors/${speciality}` : '/doctors') : navigate(speciality ? `/doctors/${speciality}/Chittagonj` : '/doctors/Location/Chittagonj')} className={`w-[94vm] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${Location === "Chittagonj" ? "bg-indigo-100 text-black" : ""}`}>Chittagonj</p>
             <p onClick={()=> Location === 'Khulna' ? navigate(speciality ? `/doctors/${speciality}` : '/doctors') : navigate(speciality ? `/doctors/${speciality}/Khulna` : '/doctors/Location/Khulna')} className={`w-[94vm] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${Location === "Khulna" ? "bg-indigo-100 text-black" : ""}`}>Khulna</p>
             <p onClick={()=> Location === 'Rajshahi' ? navigate(speciality ? `/doctors/${speciality}` : '/doctors') : navigate(speciality ? `/doctors/${speciality}/Rajshahi` : '/doctors/Location/Rajshahi')} className={`w-[94vm] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${Location === "Rajshahi" ? "bg-indigo-100 text-black" : ""}`}>Rajshahi</p>
             <p onClick={()=> Location === 'Sylhet' ? navigate(speciality ? `/doctors/${speciality}` : '/doctors') : navigate(speciality ? `/doctors/${speciality}/Sylhet` : '/doctors/Location/Sylhet')} className={`w-[94vm] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${Location === "Sylhet" ? "bg-indigo-100 text-black" : ""}`}>Sylhet</p>
             <p onClick={()=> Location === 'Barishal' ? navigate(speciality ? `/doctors/${speciality}` : '/doctors') : navigate(speciality ? `/doctors/${speciality}/Barishal` : '/doctors/Location/Barishal')} className={`w-[94vm] sm:w-auto pl-3 py-1.5 pr-16 border border-gray-300 rounded transition-all cursor-pointer ${Location === "Barishal" ? "bg-indigo-100 text-black" : ""}`}>Barishal</p>
-          </div>
+          </div> */}
           </div>
 
           <div className='w-full grid grid-cols-auto gap-4 gap-y-6'>

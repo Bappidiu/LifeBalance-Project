@@ -8,6 +8,7 @@ const AppContextProvider = (props) => {
   const currencySymbol = "$";
   const backendUrl = import.meta.env.VITE_BACKEND_URL;
   const [doctors, setDoctors] = useState([]);
+  const [medicines, setMedicines] = useState([]);
   
   // User Authentication State
   const [token, setToken] = useState(localStorage.getItem('token') ? localStorage.getItem('token') : false);
@@ -27,6 +28,19 @@ const AppContextProvider = (props) => {
       toast.error(error.message);
     }
   };
+  //get medicine fetch
+  const getMedicinesData = async () => {
+    try {
+        const { data } = await axios.get(backendUrl + '/api/medicine/list');
+        if (data.success) {
+            setMedicines(data.medicines);
+        } else {
+            toast.error(data.message);
+        }
+    } catch (error) {
+        toast.error(error.message);
+    }
+}
 
   // 2. Load User Profile Data
   const loadUserProfileData = async () => {
@@ -65,6 +79,7 @@ const AppContextProvider = (props) => {
 
   useEffect(() => {
     getDoctorsData();
+    getMedicinesData();
   }, []);
 
   // Load user data if token exists
@@ -86,7 +101,9 @@ const AppContextProvider = (props) => {
     userData,
     setUserData,
     loadUserProfileData,
-    bookAppointment
+    bookAppointment,
+    medicines,
+    getMedicinesData
   };
 
   return (

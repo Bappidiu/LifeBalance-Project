@@ -1,6 +1,6 @@
 import React, { useContext } from "react";
 import Login from "./pages/Login";
-import { ToastContainer, toast } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { AdminContext } from "./context/AdminContext";
 import Navbar from "./components/Navbar";
@@ -15,6 +15,11 @@ import DoctorDashboard from "./pages/Doctor/DoctorDashboard";
 import DoctorAppointments from "./pages/Doctor/DoctorAppointments";
 import DoctorProfile from "./pages/Doctor/DoctorProfile";
 
+// --- NEW IMPORTS ---
+import AddMedicine from "./pages/Admin/AddMedicine";
+import MedicineList from "./pages/Admin/MedicineList";
+import AllOrders from "./pages/Admin/AllOrders";
+
 const App = () => {
   const { aToken } = useContext(AdminContext);
   const { dToken } = useContext(DoctorContext);
@@ -26,14 +31,19 @@ const App = () => {
       <div className="flex items-start">
         <Sidebar />
         <Routes>
-          {/* Admin Route */}
+          {/* Admin Routes */}
           <Route path="/" element={<></>} />
           <Route path="/admin-dashboard" element={<Dashboard />} />
           <Route path="/all-appointments" element={<AllAppointments />} />
           <Route path="/add-doctor" element={<AddDoctor />} />
           <Route path="/doctor-list" element={<DoctorsList />} />
+          
+          {/* --- NEW ROUTES ADDED HERE --- */}
+          <Route path="/add-medicine" element={<AddMedicine />} />
+          <Route path="/medicine-list" element={<MedicineList />} />
+          <Route path="/all-orders" element={<AllOrders />} />
 
-          {/* Doctor Route */}
+          {/* Doctor Routes */}
           <Route path="/doctor-dashboard" element={<DoctorDashboard />} />
           <Route path="/doctor-appointments" element={<DoctorAppointments />} />
           <Route path="/doctor-profile" element={<DoctorProfile />} />
